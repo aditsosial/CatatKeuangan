@@ -2,112 +2,199 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Buku Kas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
-    --paper:#EDEFE2;
-    --paper-line:#D8D9C4;
-    --ink:#1F2D2A;
-    --ink-soft:#5B6B62;
-    --gold:#A9821E;
-    --income:#2F6F4E;
-    --income-soft:#E4EEE3;
-    --expense:#A63A32;
-    --expense-soft:#F3E4DF;
-    --card:#F7F6EC;
-    --shadow: 0 1px 0 rgba(31,45,42,0.06);
+    --paper:#F1EFE4;
+    --ink:#20302C;
+    --ink-soft:#68766D;
+    --gold:#AD8420;
+    --income:#2E7350;
+    --income-soft:#E2EFE5;
+    --expense:#B23F31;
+    --expense-soft:#F5E4DF;
+    --card:#FFFFFF;
+    --border:#E3E0D0;
+    --shadow-sm: 0 1px 2px rgba(32,48,44,0.06), 0 1px 1px rgba(32,48,44,0.04);
+    --shadow-md: 0 8px 24px rgba(32,48,44,0.08), 0 2px 6px rgba(32,48,44,0.05);
+    --radius: 18px;
+    --radius-sm: 12px;
+    --nav-h: 68px;
   }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{ -webkit-text-size-adjust:100%; }
   body{
     margin:0;
     background:var(--paper);
-    background-image:
-      linear-gradient(var(--paper-line) 1px, transparent 1px);
-    background-size: 100% 2.6em;
-    background-position: 0 6.2em;
     color:var(--ink);
     font-family:'IBM Plex Sans', sans-serif;
     min-height:100vh;
+    min-height:100dvh;
   }
-  .wrap{max-width:920px;margin:0 auto;padding:2.5rem 1.5rem 4rem;}
+  button, input, select{ font-family:inherit; }
+  ::selection{ background: var(--gold); color:#fff; }
+
+  /* ---------- Layout shells ---------- */
+  .app{ display:none; }
+  .app.visible{ display:block; }
+  .wrap{
+    max-width:960px;
+    margin:0 auto;
+    padding:1.25rem 1.1rem calc(var(--nav-h) + 2rem);
+  }
+  @media (min-width:840px){
+    .wrap{ padding:2.5rem 1.5rem 4rem; }
+  }
+
+  /* ---------- Header ---------- */
   header{
     display:flex;
     justify-content:space-between;
-    align-items:flex-end;
-    border-bottom:2px solid var(--ink);
-    padding-bottom:1rem;
-    margin-bottom:1.75rem;
-    flex-wrap:wrap;
+    align-items:center;
     gap:1rem;
+    margin-bottom:1.5rem;
+    flex-wrap:wrap;
   }
   header .title{
     font-family:'Fraunces', serif;
     font-weight:600;
-    font-size:2.1rem;
+    font-size:1.55rem;
     letter-spacing:-0.01em;
+    display:flex;
+    flex-direction:column;
   }
   header .title small{
-    display:block;
     font-family:'IBM Plex Sans',sans-serif;
-    font-weight:500;
+    font-weight:600;
     font-size:0.62rem;
-    letter-spacing:0.18em;
+    letter-spacing:0.16em;
     text-transform:uppercase;
     color:var(--gold);
-    margin-bottom:0.35rem;
+    margin-bottom:0.2rem;
   }
-  .saldo{
+  .headerRight{
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+  }
+  .saldo-chip{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:100px;
+    padding:0.4rem 0.9rem;
+    box-shadow:var(--shadow-sm);
     text-align:right;
   }
-  .saldo .label{
-    font-size:0.68rem;
-    letter-spacing:0.14em;
+  .saldo-chip .label{
+    font-size:0.6rem;
+    letter-spacing:0.1em;
     text-transform:uppercase;
     color:var(--ink-soft);
-    margin-bottom:0.15rem;
   }
-  .saldo .amount{
+  .saldo-chip .amount{
     font-family:'IBM Plex Mono', monospace;
-    font-size:1.6rem;
+    font-size:1rem;
     font-weight:600;
   }
   .amount.pos{color:var(--income);}
   .amount.neg{color:var(--expense);}
 
+  .iconbtn{
+    width:40px;height:40px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:100px;
+    cursor:pointer;
+    box-shadow:var(--shadow-sm);
+    color:var(--ink-soft);
+  }
+  .iconbtn:hover{ color:var(--expense); border-color:var(--expense); }
+  .iconbtn svg{ width:18px;height:18px; }
+
+  /* ---------- Status bar ---------- */
+  #statusBar{
+    display:none;
+    font-size:0.82rem;
+    margin-bottom:1rem;
+    padding:0.6rem 0.9rem;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-sm);
+  }
+
+  /* ---------- Top tabs (desktop) ---------- */
   .tabs{
-    display:flex;
-    gap:0.25rem;
+    display:none;
+    gap:0.3rem;
     margin-bottom:1.5rem;
-    border-bottom:1px solid var(--paper-line);
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:100px;
+    padding:0.3rem;
+    box-shadow:var(--shadow-sm);
+    width:fit-content;
+  }
+  @media (min-width:720px){
+    .tabs{ display:inline-flex; }
+    .bottomnav{ display:none; }
+    .wrap{ padding-bottom:2.5rem; }
   }
   .tab{
-    font-family:'Fraunces', serif;
-    font-size:0.95rem;
-    font-weight:500;
-    padding:0.6rem 1.1rem 0.55rem;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.85rem;
+    font-weight:600;
+    padding:0.55rem 1.1rem;
     cursor:pointer;
     background:none;
     border:none;
     color:var(--ink-soft);
-    border-bottom:2px solid transparent;
-    margin-bottom:-1px;
+    border-radius:100px;
   }
-  .tab.active{
-    color:var(--ink);
-    border-bottom:2px solid var(--gold);
-  }
+  .tab.active{ color:#fff; background:var(--ink); }
 
+  /* ---------- Bottom nav (mobile) ---------- */
+  .bottomnav{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    height:var(--nav-h);
+    padding-bottom:env(safe-area-inset-bottom);
+    background:var(--card);
+    border-top:1px solid var(--border);
+    display:flex;
+    z-index:20;
+  }
+  .navbtn{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:0.2rem;
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-size:0.66rem;
+    font-weight:600;
+    font-family:'IBM Plex Sans',sans-serif;
+    cursor:pointer;
+  }
+  .navbtn svg{ width:21px;height:21px; }
+  .navbtn.active{ color:var(--gold); }
+
+  /* ---------- Cards ---------- */
   .card{
     background:var(--card);
-    border:1px solid var(--paper-line);
-    box-shadow:var(--shadow);
-    border-radius:2px;
-    padding:1.5rem;
-    margin-bottom:1.5rem;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow-sm);
+    border-radius:var(--radius);
+    padding:1.25rem;
+    margin-bottom:1.1rem;
   }
   .card h2{
     font-family:'Fraunces', serif;
@@ -119,249 +206,372 @@
     gap:0.5rem;
   }
   .eyebrow{
-    font-size:0.62rem;
-    letter-spacing:0.16em;
+    font-size:0.6rem;
+    letter-spacing:0.14em;
     text-transform:uppercase;
     color:var(--gold);
-    font-weight:600;
+    font-weight:700;
     font-family:'IBM Plex Sans',sans-serif;
   }
 
+  /* ---------- Form ---------- */
   form{display:grid;gap:0.9rem;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;}
+  @media (max-width:480px){ .row2{grid-template-columns:1fr;} }
   .field label{
     display:block;
     font-size:0.72rem;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
+    font-weight:600;
+    letter-spacing:0.03em;
     color:var(--ink-soft);
-    margin-bottom:0.3rem;
+    margin-bottom:0.35rem;
   }
   .field input, .field select{
     width:100%;
-    padding:0.55rem 0.7rem;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    font-family:'IBM Plex Sans',sans-serif;
-    font-size:0.92rem;
+    padding:0.75rem 0.85rem;
+    border:1.5px solid var(--border);
+    background:var(--paper);
+    font-size:1rem; /* 16px min prevents iOS zoom on focus */
     color:var(--ink);
-    border-radius:2px;
+    border-radius:var(--radius-sm);
+    transition:border-color .15s;
   }
   .field input:focus, .field select:focus{
-    outline:2px solid var(--gold);
-    outline-offset:1px;
+    outline:none;
+    border-color:var(--gold);
   }
   .typetoggle{
     display:flex;
     gap:0.5rem;
+    background:var(--paper);
+    padding:0.3rem;
+    border-radius:var(--radius-sm);
   }
   .typetoggle button{
     flex:1;
-    padding:0.55rem;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    font-family:'IBM Plex Sans',sans-serif;
-    font-weight:500;
-    font-size:0.85rem;
+    padding:0.65rem;
+    border:none;
+    background:none;
+    font-weight:600;
+    font-size:0.88rem;
     cursor:pointer;
-    border-radius:2px;
+    border-radius:9px;
     color:var(--ink-soft);
   }
-  .typetoggle button.active[data-type="pemasukan"]{
-    background:var(--income-soft);
-    border-color:var(--income);
-    color:var(--income);
-  }
-  .typetoggle button.active[data-type="pengeluaran"]{
-    background:var(--expense-soft);
-    border-color:var(--expense);
-    color:var(--expense);
-  }
+  .typetoggle button.active[data-type="pemasukan"]{ background:var(--income); color:#fff; }
+  .typetoggle button.active[data-type="pengeluaran"]{ background:var(--expense); color:#fff; }
+
   .submitbtn{
-    margin-top:0.3rem;
+    margin-top:0.2rem;
     background:var(--ink);
-    color:var(--paper);
+    color:#fff;
     border:none;
-    padding:0.7rem;
-    font-family:'Fraunces', serif;
-    font-weight:600;
+    padding:0.85rem;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:700;
     font-size:0.95rem;
     cursor:pointer;
-    border-radius:2px;
+    border-radius:var(--radius-sm);
   }
-  .submitbtn:hover{background:#33453F;}
+  .submitbtn:disabled{ opacity:0.6; }
+  .submitbtn:not(:disabled):active{ transform:scale(0.98); }
 
+  /* ---------- Table / list ---------- */
   table{width:100%;border-collapse:collapse;font-size:0.88rem;}
   th{
     text-align:left;
-    font-size:0.66rem;
-    letter-spacing:0.1em;
+    font-size:0.63rem;
+    letter-spacing:0.08em;
     text-transform:uppercase;
     color:var(--ink-soft);
-    font-weight:600;
+    font-weight:700;
     padding:0.4rem 0.5rem;
-    border-bottom:1px solid var(--ink);
+    border-bottom:1.5px solid var(--ink);
   }
   td{
-    padding:0.55rem 0.5rem;
-    border-bottom:1px solid var(--paper-line);
+    padding:0.65rem 0.5rem;
+    border-bottom:1px solid var(--border);
     vertical-align:middle;
   }
   td.num, th.num{text-align:right;font-family:'IBM Plex Mono',monospace;}
   tr:last-child td{border-bottom:none;}
   .tag{
     display:inline-block;
-    padding:0.15rem 0.5rem;
-    border-radius:20px;
+    padding:0.2rem 0.6rem;
+    border-radius:100px;
     font-size:0.72rem;
-    font-weight:500;
+    font-weight:600;
   }
   .tag.pemasukan{background:var(--income-soft);color:var(--income);}
   .tag.pengeluaran{background:var(--expense-soft);color:var(--expense);}
   .delbtn{
     background:none;border:none;cursor:pointer;color:var(--ink-soft);
-    font-size:0.85rem;padding:0.2rem 0.4rem;
+    font-size:0.8rem;padding:0.4rem 0.5rem;font-weight:600;
   }
   .delbtn:hover{color:var(--expense);}
-  .empty{
-    color:var(--ink-soft);
-    font-size:0.9rem;
-    text-align:center;
-    padding:1.5rem 0;
-  }
-  .monthfilter{
-    display:flex;
-    align-items:center;
-    gap:0.6rem;
-    margin-bottom:1rem;
-  }
+  .empty{ color:var(--ink-soft); font-size:0.9rem; text-align:center; padding:2rem 0; }
+
+  .monthfilter{ display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem; flex-wrap:wrap; }
   .monthfilter select{
-    padding:0.4rem 0.6rem;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    font-family:'IBM Plex Sans',sans-serif;
-    border-radius:2px;
+    padding:0.5rem 0.75rem;
+    border:1.5px solid var(--border);
+    background:var(--paper);
+    border-radius:var(--radius-sm);
+    font-size:0.9rem;
   }
-  .grid2{display:grid;grid-template-columns:1.1fr 0.9fr;gap:1.5rem;}
+  .grid2{display:grid;grid-template-columns:1.1fr 0.9fr;gap:1.25rem;}
+  @media (max-width:720px){ .grid2{grid-template-columns:1fr;} }
   canvas{max-height:260px;}
-  .summarybar{
-    display:flex;
-    gap:1rem;
-    margin-bottom:1rem;
-    flex-wrap:wrap;
-  }
+  .summarybar{ display:flex; gap:0.9rem; margin-bottom:1.1rem; flex-wrap:wrap; }
   .sbox{
-    flex:1;
-    min-width:140px;
-    padding:0.8rem 1rem;
-    border:1px solid var(--paper-line);
-    background:#fff;
-    border-radius:2px;
+    flex:1; min-width:140px;
+    padding:0.9rem 1rem;
+    background:var(--paper);
+    border-radius:var(--radius-sm);
   }
-  .sbox .l{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:0.25rem;}
-  .sbox .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:1.15rem;}
-  @media (max-width:720px){
-    .grid2{grid-template-columns:1fr;}
-    .row2{grid-template-columns:1fr;}
-    header{align-items:flex-start;}
-    .saldo{text-align:left;}
+  .sbox .l{font-size:0.63rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:0.25rem;}
+  .sbox .v{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:1.2rem;}
+
+  /* ---------- Auth screen ---------- */
+  .auth-shell{
+    min-height:100vh; min-height:100dvh;
+    display:flex; align-items:center; justify-content:center;
+    padding:1.5rem;
+  }
+  .auth-card{
+    width:100%; max-width:380px;
+    background:var(--card);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow-md);
+    border-radius:24px;
+    padding:2rem 1.75rem;
+  }
+  .auth-brand{
+    text-align:center;
+    margin-bottom:1.75rem;
+  }
+  .auth-brand .mark{
+    width:52px;height:52px;
+    margin:0 auto 0.9rem;
+    background:var(--ink);
+    border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .auth-brand .mark svg{ width:26px;height:26px; color:var(--gold); }
+  .auth-brand .name{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1.4rem;
+  }
+  .auth-brand .tag{
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin-top:0.2rem;
+  }
+  .auth-toggle{
+    display:flex;
+    background:var(--paper);
+    border-radius:var(--radius-sm);
+    padding:0.3rem;
+    margin-bottom:1.5rem;
+  }
+  .auth-toggle button{
+    flex:1;
+    border:none;background:none;
+    padding:0.6rem;
+    font-weight:600;
+    font-size:0.85rem;
+    border-radius:9px;
+    cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .auth-toggle button.active{ background:#fff; color:var(--ink); box-shadow:var(--shadow-sm); }
+  .authbtn{
+    width:100%;
+    margin-top:0.4rem;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:0.85rem;
+    font-weight:700;
+    font-size:0.95rem;
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+  }
+  .authbtn:disabled{ opacity:0.6; }
+  .authmsg{
+    font-size:0.82rem;
+    padding:0.6rem 0.8rem;
+    border-radius:var(--radius-sm);
+    margin-bottom:1rem;
+    background:var(--expense-soft);
+    color:var(--expense);
+    display:none;
+  }
+  .authmsg.show{ display:block; }
+  .authhint{
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    text-align:center;
+    margin-top:1.1rem;
+    line-height:1.5;
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <div class="title"><small>Pencatatan mandiri</small>Buku Kas</div>
-    <div class="saldo">
-      <div class="label">Saldo saat ini</div>
-      <div class="amount" id="saldoTotal">Rp 0</div>
+<!-- ================= AUTH SCREEN ================= -->
+<div class="auth-shell" id="authShell">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M7 15h1m4 0h1m-9 5h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/></svg>
+      </div>
+      <div class="name">Buku Kas</div>
+      <div class="tag">Catat keuangan, tenang jalani hari</div>
     </div>
-  </header>
 
-  <div id="statusBar" style="display:none;font-size:0.82rem;margin-bottom:1rem;padding:0.5rem 0.8rem;background:var(--card);border:1px solid var(--paper-line);border-radius:2px;"></div>
+    <div class="auth-toggle">
+      <button type="button" class="active" data-mode="login">Masuk</button>
+      <button type="button" data-mode="register">Daftar</button>
+    </div>
 
-  <nav class="tabs">
-    <button class="tab active" data-tab="catat">Catat Transaksi</button>
-    <button class="tab" data-tab="kategori">Rekap Kategori</button>
-    <button class="tab" data-tab="bulanan">Rekap Bulanan</button>
+    <div class="authmsg" id="authMsg"></div>
+
+    <form id="authForm">
+      <div class="field" style="margin-bottom:0.9rem;">
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" required autocomplete="username" placeholder="nama@email.com">
+      </div>
+      <div class="field" style="margin-bottom:0.9rem;">
+        <label for="authPassword">Kata Sandi</label>
+        <input type="password" id="authPassword" required autocomplete="current-password" placeholder="Minimal 6 karakter" minlength="6">
+      </div>
+      <button type="submit" class="authbtn" id="authSubmitBtn">Masuk</button>
+    </form>
+
+    <div class="authhint" id="apiWarning" style="display:none;color:var(--expense);">
+      Belum terhubung ke Google Sheet. Atur <code>APPS_SCRIPT_URL</code> di index.html — lihat README.
+    </div>
+  </div>
+</div>
+
+<!-- ================= MAIN APP ================= -->
+<div class="app" id="appShell">
+  <div class="wrap">
+
+    <header>
+      <div class="title"><small>Pencatatan mandiri</small>Buku Kas</div>
+      <div class="headerRight">
+        <div class="saldo-chip">
+          <div class="label">Saldo</div>
+          <div class="amount" id="saldoTotal">Rp 0</div>
+        </div>
+        <button class="iconbtn" id="logoutBtn" title="Keluar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div id="statusBar"></div>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="catat">Catat</button>
+      <button class="tab" data-tab="kategori">Rekap Kategori</button>
+      <button class="tab" data-tab="bulanan">Rekap Bulanan</button>
+    </nav>
+
+    <!-- TAB: CATAT -->
+    <section id="tab-catat">
+      <div class="card">
+        <h2><span class="eyebrow">Baru</span>&nbsp;Tambah Transaksi</h2>
+        <form id="form-transaksi">
+          <div class="typetoggle">
+            <button type="button" class="active" data-type="pemasukan">Pemasukan</button>
+            <button type="button" data-type="pengeluaran">Pengeluaran</button>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="jenis">Jenis / Kategori</label>
+              <select id="jenis"></select>
+            </div>
+            <div class="field">
+              <label for="jumlah">Jumlah (Rp)</label>
+              <input type="number" inputmode="numeric" id="jumlah" min="0" step="1000" placeholder="0" required>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="tanggal">Tanggal</label>
+              <input type="date" id="tanggal" required>
+            </div>
+            <div class="field">
+              <label for="catatan">Catatan (opsional)</label>
+              <input type="text" id="catatan" placeholder="mis. beli bensin">
+            </div>
+          </div>
+          <button type="submit" class="submitbtn">Simpan Transaksi</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2><span class="eyebrow">Riwayat</span>&nbsp;Transaksi Terbaru</h2>
+        <div id="listTransaksi"></div>
+      </div>
+    </section>
+
+    <!-- TAB: KATEGORI -->
+    <section id="tab-kategori" style="display:none">
+      <div class="card">
+        <div class="monthfilter">
+          <label style="font-size:0.75rem;color:var(--ink-soft);font-weight:600;">Filter bulan:</label>
+          <select id="filterBulanKategori"></select>
+        </div>
+        <h2><span class="eyebrow">Rekap</span>&nbsp;Per Jenis Kategori</h2>
+        <div class="grid2">
+          <div>
+            <table id="tabelKategori">
+              <thead><tr><th>Kategori</th><th class="num">Total</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div><canvas id="chartKategori"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: BULANAN -->
+    <section id="tab-bulanan" style="display:none">
+      <div class="card">
+        <h2><span class="eyebrow">Rekap</span>&nbsp;Per Bulan</h2>
+        <div class="summarybar" id="ringkasanBulanIni"></div>
+        <canvas id="chartBulanan" style="max-height:280px;"></canvas>
+      </div>
+      <div class="card">
+        <h2>Detail Per Bulan</h2>
+        <table id="tabelBulanan">
+          <thead><tr><th>Bulan</th><th class="num">Pemasukan</th><th class="num">Pengeluaran</th><th class="num">Selisih</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <nav class="bottomnav">
+    <button class="navbtn active" data-tab="catat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Catat
+    </button>
+    <button class="navbtn" data-tab="kategori">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+      Kategori
+    </button>
+    <button class="navbtn" data-tab="bulanan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+      Bulanan
+    </button>
   </nav>
-
-  <!-- TAB: CATAT -->
-  <section id="tab-catat">
-    <div class="card">
-      <h2><span class="eyebrow">Baru</span>&nbsp;Tambah Transaksi</h2>
-      <form id="form-transaksi">
-        <div class="typetoggle">
-          <button type="button" class="active" data-type="pemasukan">Pemasukan</button>
-          <button type="button" data-type="pengeluaran">Pengeluaran</button>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="jenis">Jenis / Kategori</label>
-            <select id="jenis"></select>
-          </div>
-          <div class="field">
-            <label for="jumlah">Jumlah (Rp)</label>
-            <input type="number" id="jumlah" min="0" step="1000" placeholder="0" required>
-          </div>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="tanggal">Tanggal</label>
-            <input type="date" id="tanggal" required>
-          </div>
-          <div class="field">
-            <label for="catatan">Catatan (opsional)</label>
-            <input type="text" id="catatan" placeholder="mis. beli bensin">
-          </div>
-        </div>
-        <button type="submit" class="submitbtn">Simpan Transaksi</button>
-      </form>
-    </div>
-
-    <div class="card">
-      <h2><span class="eyebrow">Riwayat</span>&nbsp;Transaksi Terbaru</h2>
-      <div id="listTransaksi"></div>
-    </div>
-  </section>
-
-  <!-- TAB: KATEGORI -->
-  <section id="tab-kategori" style="display:none">
-    <div class="card">
-      <div class="monthfilter">
-        <label style="font-size:0.75rem;color:var(--ink-soft);">Filter bulan:</label>
-        <select id="filterBulanKategori"></select>
-      </div>
-      <h2><span class="eyebrow">Rekap</span>&nbsp;Per Jenis Kategori</h2>
-      <div class="grid2">
-        <div>
-          <table id="tabelKategori">
-            <thead><tr><th>Kategori</th><th class="num">Total</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div><canvas id="chartKategori"></canvas></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TAB: BULANAN -->
-  <section id="tab-bulanan" style="display:none">
-    <div class="card">
-      <h2><span class="eyebrow">Rekap</span>&nbsp;Per Bulan</h2>
-      <div class="summarybar" id="ringkasanBulanIni"></div>
-      <canvas id="chartBulanan" style="max-height:280px;"></canvas>
-    </div>
-    <div class="card">
-      <h2>Detail Per Bulan</h2>
-      <table id="tabelBulanan">
-        <thead><tr><th>Bulan</th><th class="num">Pemasukan</th><th class="num">Pengeluaran</th><th class="num">Selisih</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
-
 </div>
 
 <script>
@@ -378,28 +588,7 @@ let currentType = "pemasukan";
 let transaksi = [];
 let chartKategori = null;
 let chartBulanan = null;
-
-async function apiList(){
-  const res = await fetch(APPS_SCRIPT_URL);
-  if(!res.ok) throw new Error('Gagal memuat data dari Google Sheet');
-  return res.json();
-}
-async function apiAdd(item){
-  const res = await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight
-    body: JSON.stringify({ action: 'add', transaksi: item })
-  });
-  return res.json();
-}
-async function apiDelete(id){
-  const res = await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'delete', id })
-  });
-  return res.json();
-}
+let currentUser = null; // { id, email }
 
 const rupiah = (n) => "Rp " + Math.round(n).toLocaleString('id-ID');
 const bulanNama = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
@@ -412,7 +601,111 @@ function monthLabel(key){
   const [y,m] = key.split('-');
   return bulanNama[parseInt(m,10)-1] + " " + y;
 }
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
+/* ============== API ============== */
+async function apiCall(action, extra){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight
+    body: JSON.stringify({ action, ...extra })
+  });
+  if(!res.ok) throw new Error('Gagal menghubungi server');
+  return res.json();
+}
+async function apiList(userId){
+  const url = APPS_SCRIPT_URL + '?action=list&userId=' + encodeURIComponent(userId);
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Gagal memuat data');
+  return res.json();
+}
+
+/* ============== AUTH ============== */
+let authMode = 'login';
+
+function isConfigured(){
+  return !APPS_SCRIPT_URL.includes('PASTE_URL');
+}
+
+document.querySelectorAll('.auth-toggle button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.auth-toggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    authMode = btn.dataset.mode;
+    document.getElementById('authSubmitBtn').textContent = authMode === 'login' ? 'Masuk' : 'Daftar';
+    document.getElementById('authPassword').autocomplete = authMode === 'login' ? 'current-password' : 'new-password';
+    hideAuthMsg();
+  });
+});
+
+function showAuthMsg(msg){
+  const el = document.getElementById('authMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideAuthMsg(){
+  document.getElementById('authMsg').classList.remove('show');
+}
+
+document.getElementById('authForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  hideAuthMsg();
+  if(!isConfigured()){
+    showAuthMsg('Aplikasi belum terhubung ke Google Sheet. Lihat README untuk setup Apps Script.');
+    return;
+  }
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const btn = document.getElementById('authSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = authMode === 'login' ? 'Memproses…' : 'Mendaftarkan…';
+  try{
+    const result = await apiCall(authMode, { email, password });
+    if(result.success){
+      currentUser = result.user;
+      localStorage.setItem('buku-kas:session', JSON.stringify(currentUser));
+      enterApp();
+    } else {
+      showAuthMsg(result.error || 'Terjadi kesalahan, coba lagi.');
+    }
+  }catch(err){
+    showAuthMsg('Tidak bisa terhubung ke server: ' + err.message);
+  }
+  btn.disabled = false;
+  btn.textContent = authMode === 'login' ? 'Masuk' : 'Daftar';
+});
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  localStorage.removeItem('buku-kas:session');
+  currentUser = null;
+  transaksi = [];
+  document.getElementById('appShell').classList.remove('visible');
+  document.getElementById('authShell').style.display = 'flex';
+  document.getElementById('authForm').reset();
+});
+
+function enterApp(){
+  document.getElementById('authShell').style.display = 'none';
+  document.getElementById('appShell').classList.add('visible');
+  loadData();
+}
+
+function tryRestoreSession(){
+  if(!isConfigured()){
+    document.getElementById('apiWarning').style.display = 'block';
+  }
+  try{
+    const raw = localStorage.getItem('buku-kas:session');
+    if(raw){
+      currentUser = JSON.parse(raw);
+      enterApp();
+    }
+  }catch(e){ /* ignore */ }
+}
+
+/* ============== APP DATA ============== */
 function setStatus(msg, isError){
   const el = document.getElementById('statusBar');
   if(!el) return;
@@ -423,15 +716,10 @@ function setStatus(msg, isError){
 }
 
 async function loadData(){
-  if(APPS_SCRIPT_URL.includes('PASTE_URL')){
-    setStatus('Belum terhubung ke Google Sheet — lihat README untuk cara setup Apps Script.', true);
-    transaksi = [];
-    render();
-    return;
-  }
-  setStatus('Memuat data dari Google Sheet…', false);
+  if(!currentUser) return;
+  setStatus('Memuat data…', false);
   try{
-    const data = await apiList();
+    const data = await apiList(currentUser.id);
     transaksi = data.sort((a,b) => (a.tanggal < b.tanggal ? 1 : -1));
     setStatus('');
   }catch(e){
@@ -469,6 +757,7 @@ document.getElementById('form-transaksi').addEventListener('submit', async (e)=>
   if(!jumlah || jumlah <= 0) return;
   const item = {
     id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    userId: currentUser.id,
     tipe: currentType,
     kategori: document.getElementById('jenis').value,
     jumlah: jumlah,
@@ -479,7 +768,7 @@ document.getElementById('form-transaksi').addEventListener('submit', async (e)=>
   btn.disabled = true;
   btn.textContent = 'Menyimpan…';
   try{
-    await apiAdd(item);
+    await apiCall('add', { transaksi: item });
     document.getElementById('jumlah').value = '';
     document.getElementById('catatan').value = '';
     await loadData();
@@ -492,7 +781,7 @@ document.getElementById('form-transaksi').addEventListener('submit', async (e)=>
 
 async function hapusTransaksi(id){
   try{
-    await apiDelete(id);
+    await apiCall('delete', { id, userId: currentUser.id });
     await loadData();
   }catch(err){
     setStatus('Gagal menghapus transaksi: ' + err.message, true);
@@ -512,7 +801,7 @@ function renderList(){
       <td>${t.tanggal}</td>
       <td><span class="tag ${t.tipe}">${t.tipe === 'pemasukan' ? 'Masuk' : 'Keluar'}</span></td>
       <td>${t.kategori}${t.catatan ? ' — <span style="color:var(--ink-soft)">'+escapeHtml(t.catatan)+'</span>' : ''}</td>
-      <td class="num" style="color:var(--${cls === 'income' ? 'income' : 'expense'})">${sign} ${rupiah(t.jumlah)}</td>
+      <td class="num" style="color:var(--${cls})">${sign} ${rupiah(t.jumlah)}</td>
       <td><button class="delbtn" onclick="hapusTransaksi('${t.id}')">Hapus</button></td>
     </tr>`;
   }).join('');
@@ -520,10 +809,6 @@ function renderList(){
     <thead><tr><th>Tanggal</th><th>Tipe</th><th>Kategori</th><th class="num">Jumlah</th><th></th></tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
-}
-
-function escapeHtml(s){
-  return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 function renderSaldo(){
@@ -575,14 +860,14 @@ function renderKategori(){
   const ctx = document.getElementById('chartKategori');
   const labels = entries.map(e=>e[0].split('||')[0]);
   const values = entries.map(e=>e[1]);
-  const colors = entries.map(e=> e[0].split('||')[1] === 'pemasukan' ? '#2F6F4E' : '#A63A32');
+  const colors = entries.map(e=> e[0].split('||')[1] === 'pemasukan' ? '#2E7350' : '#B23F31');
   if(chartKategori) chartKategori.destroy();
   if(entries.length > 0){
     chartKategori = new Chart(ctx, {
       type: 'doughnut',
-      data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor:'#F7F6EC', borderWidth:2 }] },
+      data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor:'#FFFFFF', borderWidth:2 }] },
       options: {
-        plugins: { legend: { position:'bottom', labels:{ font:{ family:'IBM Plex Sans', size:11 }, color:'#5B6B62' } } }
+        plugins: { legend: { position:'bottom', labels:{ font:{ family:'IBM Plex Sans', size:11 }, color:'#68766D' } } }
       }
     });
   }
@@ -616,7 +901,6 @@ function renderBulanan(){
     }).join('');
   }
 
-  // ringkasan bulan terbaru
   const ringkasan = document.getElementById('ringkasanBulanIni');
   if(sortedMonths.length > 0){
     const last = sortedMonths[sortedMonths.length-1];
@@ -638,17 +922,17 @@ function renderBulanan(){
       data: {
         labels: sortedMonths.map(monthLabel),
         datasets: [
-          { label:'Pemasukan', data: sortedMonths.map(m=>perMonth[m].masuk), backgroundColor:'#2F6F4E', borderRadius:2 },
-          { label:'Pengeluaran', data: sortedMonths.map(m=>perMonth[m].keluar), backgroundColor:'#A63A32', borderRadius:2 }
+          { label:'Pemasukan', data: sortedMonths.map(m=>perMonth[m].masuk), backgroundColor:'#2E7350', borderRadius:6 },
+          { label:'Pengeluaran', data: sortedMonths.map(m=>perMonth[m].keluar), backgroundColor:'#B23F31', borderRadius:6 }
         ]
       },
       options: {
         scales: {
-          x: { grid:{ display:false }, ticks:{ font:{ family:'IBM Plex Sans', size:11 }, color:'#5B6B62' } },
-          y: { grid:{ color:'#D8D9C4' }, ticks:{ font:{ family:'IBM Plex Mono', size:10 }, color:'#5B6B62',
+          x: { grid:{ display:false }, ticks:{ font:{ family:'IBM Plex Sans', size:11 }, color:'#68766D' } },
+          y: { grid:{ color:'#E3E0D0' }, ticks:{ font:{ family:'IBM Plex Mono', size:10 }, color:'#68766D',
                callback: v => 'Rp ' + (v/1000) + 'rb' } }
         },
-        plugins: { legend: { position:'bottom', labels:{ font:{ family:'IBM Plex Sans', size:11 }, color:'#5B6B62' } } }
+        plugins: { legend: { position:'bottom', labels:{ font:{ family:'IBM Plex Sans', size:11 }, color:'#68766D' } } }
       }
     });
   }
@@ -664,20 +948,20 @@ function render(){
 
 document.getElementById('filterBulanKategori').addEventListener('change', renderKategori);
 
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('tab-catat').style.display = 'none';
-    document.getElementById('tab-kategori').style.display = 'none';
-    document.getElementById('tab-bulanan').style.display = 'none';
-    document.getElementById('tab-'+tab.dataset.tab).style.display = 'block';
-    if(tab.dataset.tab === 'kategori') renderKategori();
-    if(tab.dataset.tab === 'bulanan') renderBulanan();
-  });
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.navbtn').forEach(t=>t.classList.toggle('active', t.dataset.tab === name));
+  document.getElementById('tab-catat').style.display = name === 'catat' ? 'block' : 'none';
+  document.getElementById('tab-kategori').style.display = name === 'kategori' ? 'block' : 'none';
+  document.getElementById('tab-bulanan').style.display = name === 'bulanan' ? 'block' : 'none';
+  if(name === 'kategori') renderKategori();
+  if(name === 'bulanan') renderBulanan();
+}
+document.querySelectorAll('.tab, .navbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
 });
 
-loadData();
+tryRestoreSession();
 </script>
 </body>
 </html>
